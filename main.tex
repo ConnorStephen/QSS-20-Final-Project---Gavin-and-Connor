@@ -1,0 +1,165 @@
+\documentclass[12pt]{article}
+
+\usepackage[english]{babel}
+\usepackage[round]{natbib}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage [autostyle, english = american]{csquotes}
+\MakeOuterQuote{"}
+\usepackage{hyperref}
+\usepackage{placeins}
+\usepackage[margin=1in]{geometry}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{tablefootnote}
+\usepackage{authblk} 
+\usepackage{verbatim}
+\usepackage[bottom]{footmisc}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{soul}
+\usepackage{booktabs}
+
+\usetikzlibrary{arrows,shapes, positioning, calc, fit}
+\tikzset{
+    between/.style args={#1 and #2}{
+         at = ($(#1)!0.5!(#2)$)
+    }
+}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
+
+\title{\bf QSS 20 Final Project Milestone 1}
+
+\author{Gavin Greaton, Connor Stephen}
+
+\date{Last updated: \today}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+GitHub Code Repository: \url{https://github.com/abc}
+\end{center}
+
+
+\section{Project Title}
+
+{\color{black}
+\begin{itemize}
+    \item Surface, Style, and Specialization: The Evolution of Play in Modern Professional Tennis
+\end{itemize} 
+}
+
+\section{Project GitHub Repo}
+
+{\color{blue}
+\begin{itemize}
+    \item Create a Private GitHub Repository from one of the team member's account.  This will be used for uploading code and replication materials
+    \item Invite your team members as collaborators so that they can push to the repository
+    \item Invite me (\texttt{@kengchichang}) to the repository so that I can also see the repository 
+    \item Add the link to the repository at the top of this document
+    \item Here is \href{https://github.com/KengChiChang/cse-284-prs-comparison}{one example} of how the final repository would look like at the end of this class
+\end{itemize} 
+}
+
+
+\section{Research Questions / Problem Statement}
+
+{\color{black}
+This project investigates how surface type has shaped player specialization and play style in professional tennis, and whether the modern game has shifted toward greater serve dominance and surface adaptability over time. Specifically, we ask: (1) Do players exhibit statistically distinct performance profiles across hard, clay, and grass courts, or are elite players increasingly adaptable across surfaces? (2) Have serve-related metrics such as aces, hold rate, and first-serve points won become more important over time, and does this trend vary by surface? (3) Can players be clustered into distinct play-style groups based on match statistics, and how have these clusters evolved across eras? This question is important because tennis is structured around surface heterogeneity, yet recent technological, equipment, and training changes may be reducing stylistic differences. We hypothesize that while surface specialization historically dominated (e.g., clay specialists vs. grass serve-and-volleyers), modern elite players show greater cross-surface adaptability, alongside an overall increase in serve dominance.
+
+}
+
+\section{Background / Related Work}
+
+{\color{black}
+Tennis analytics research has explored strategy and equilibrium behavior in serving and returning, including work such as “Nash at Wimbledon” (Gauriot & Page, 2016), which models serve direction as a mixed-strategy equilibrium. Other work has examined surface effects on match outcomes and point structures, showing that clay courts historically reduce serve effectiveness relative to grass. Jeff Sackmann’s Tennis Abstract database has also documented longitudinal trends in serve speeds, ace rates, and rally length. However, most prior work either focuses on micro-level strategy (e.g., serve direction) or aggregate surface win percentages. Our project differs by integrating surface specialization, longitudinal serve trends, and unsupervised clustering of play styles into a unified framework. Rather than analyzing a single behavior, we analyze the structural evolution of tennis as a system over time (2000–2025).
+
+}
+
+\section{Data \& Tools}
+
+{\color{black}
+Data
+We will use publicly available professional tennis match-level datasets, primarily from Jeff Sackmann’s tennis data repositories and Tennis Abstract. These datasets include ATP match results and detailed match statistics across surfaces from approximately 2000–2025. We already have access to the raw CSV files and will merge match-level data with player-level identifiers. 
+
+Potential key variables include:
+
+\begin{itemize}
+    \item Surface type (hard, clay, grass)
+    \item Aces
+    \item Double faults
+    \item First-serve percentage
+    \item First-serve points won
+    \item Second-serve points won
+    \item Break points faced/saved
+    \item Service hold rate
+    \item Match outcome
+    \item Year
+\end{itemize}
+
+
+We will clean the data by:
+
+\begin{itemize}
+    \item Filtering to main-tour matches
+    \item Standardizing surface labels
+    \item Handling missing stat fields
+    \item Aggregating match-level stats into player-season-surface level summaries
+    \item Normalizing metrics to allow cross-player comparison
+\end{itemize}
+
+We plan to use Python, primarily:
+
+\begin{itemize}
+    \item pandas for data cleaning and transformation
+    \item numpy for numerical operations
+    \item matplotlib / seaborn for visualization
+    \item scikit-learn for clustering (k-means, hierarchical clustering)
+    \item Possibly statsmodels for regression-based trend analysis
+    \item Version control and reproducibility will be maintained through GitHub.
+\end{itemize}
+}
+
+\section{Measurement / Analysis Plan}
+
+{\color{black}
+Our analysis proceeds in four integrated stages. First, we conduct a surface specialization analysis by computing per-player performance metrics by surface (e.g., win rate, serve efficiency), measuring within-player variance across surfaces, and constructing a specialization index that captures the degree to which performance differs between clay, grass, and hard courts. Second, we examine serve dominance over time by tracking longitudinal trends from 2000 to 2025 in serve-related metrics and running regressions of match outcomes on serve statistics by surface and year, testing whether the explanatory power and coefficients of serve variables increase over time. Third, we perform play-style clustering by normalizing key performance indicators and applying clustering algorithms to identify distinct groups of players, which we then label conceptually (e.g., serve-heavy, baseline grinder, balanced all-court). Finally, we analyze the temporal evolution of these clusters by measuring their prevalence by year, assessing whether particular styles become more dominant, and evaluating whether clusters demonstrate increasing cross-surface adaptability. Across stages, model evaluation will rely on explained variance, silhouette scores to assess clustering quality, and statistical significance of temporal trends in regression coefficients.
+}
+
+\section{Potential Challenges \& Mitigation}
+
+
+{\color{black}
+One challenge is missing or inconsistent match statistics across earlier years. If detailed serve stats are incomplete before a certain year, we may restrict our time window to 2005–2025. Another challenge is computational complexity when aggregating large match-level datasets; we will mitigate this by aggregating to player-season-surface level early in the pipeline. A conceptual challenge is defining “play style” objectively; we will mitigate this by using standardized metrics and unsupervised clustering rather than subjective labels. If clustering results are unstable, we will compare multiple clustering methods and validate with silhouette scores.
+}
+
+\section{Timeline}
+
+\begin{itemize}
+    \item Week 6 (by 2/13): Finalize research question, Download and clean raw match datasets, Construct cleaned master dataset
+
+    \item Week 7 (by 2/20): Compute player-surface performance summaries, Build specialization index, Preliminary visualizations
+
+    \item Week 8 (by 2/27): Conduct longitudinal serve-dominance analysis, Run time-trend regressions, Draft initial figures
+
+    \item Week 9 (by 3/6): Perform clustering analysis, Evaluate clustering robustness, Interpret cluster characteristics
+
+    \item Week 10 (by 3/13): Analyze cluster evolution over time, Finalize statistical outputs, Begin writing report
+
+    \item Finals Week (by 3/17): Complete full 8-page scientific report, Finalize GitHub repository (clean code + replication instructions), Prepare final presentation slides
+
+\end{itemize} 
+
+
+\end{document}
+
