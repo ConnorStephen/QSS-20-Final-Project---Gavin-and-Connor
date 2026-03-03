@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
 
-# --------------------
 # Paths
-# --------------------
 POINTS_FILES = [
     "data/raw/charting-m-points-to-2009.csv",
     "data/raw/charting-m-points-2010s.csv",
@@ -11,13 +9,12 @@ POINTS_FILES = [
 ]
 MATCHES_PATH = "data/raw/charting-m-matches.csv"
 
-# Write a single big processed file (CSV). Later we can convert to parquet.
+# Single big processed file
 OUT_PATH = "data/processed/points_all_parsed.csv"
 
-# --------------------
+
 # Config
-# --------------------
-CHUNKSIZE = 250000  # adjust up/down depending on your RAM
+CHUNKSIZE = 250000  
 
 VALID_SURFACES = set(["Hard", "Clay", "Grass"])
 SERVE_DIR = set(["0", "4", "5", "6"])
@@ -116,14 +113,14 @@ def parse_point(point_string):
                     has_approach = True
                 i += 1
 
-            # optional direction 0-3
+            #  direction 0-3
             if i < len(s) and s[i] in set(["0", "1", "2", "3"]):
                 i += 1
-                # optional return depth 7-9
+                #  return depth 7-9
                 if i < len(s) and s[i] in set(["7", "8", "9"]):
                     i += 1
 
-            # optional error type
+            #  error type
             if i < len(s) and s[i] in SERVE_FAULT:
                 i += 1
 
@@ -165,17 +162,13 @@ def load_and_clean_matches(matches_path):
 
 
 def parse_chunk(df):
-    # clean strings
     df["1st"] = df["1st"].apply(as_clean_str)
     df["2nd"] = df["2nd"].apply(as_clean_str)
 
-    # build point_string
     df["point_string"] = df.apply(pick_point_string, axis=1)
 
-    # parse (returns tuples)
     parsed = df["point_string"].map(parse_point)
 
-    # split tuples into columns (fast)
     cols = [
         "serve_dir", "is_sv", "serve_fault_type", "is_ace", "is_unreturned",
         "rally_shots", "point_end", "last_shot_type", "has_approach"
@@ -185,14 +178,12 @@ def parse_chunk(df):
     return pd.concat([df, parsed_df], axis=1)
 
 
-# --------------------
-# Main: chunked pipeline
-# --------------------
+#main chunked pipeline
 matches = load_and_clean_matches(MATCHES_PATH)
 
 usecols = ["match_id", "Pt", "Set1", "Set2", "Gm1", "Gm2", "Pts", "Gm#", "TbSet", "Svr", "1st", "2nd", "Notes", "PtWinner"]
 
-# overwrite output each run
+# output each run
 first_write = True
 
 for fp in POINTS_FILES:
@@ -219,7 +210,7 @@ for fp in POINTS_FILES:
         chunk["match_id"] = chunk["match_id"].astype(str).str.strip()
         chunk["source_file"] = fp
 
-        # numeric coercions (optional)
+        # numeric coercions 
         for col in ["Pt", "Set1", "Set2", "Gm1", "Gm2", "Gm#", "Svr", "PtWinner"]:
             if col in chunk.columns:
                 chunk[col] = pd.to_numeric(chunk[col], errors="coerce")
@@ -240,7 +231,7 @@ for fp in POINTS_FILES:
 
 print("\nDone. Wrote:", OUT_PATH)
 
-# Optional quick sanity check (reads only a small sample from the output)
+# making sure this works 
 sample = pd.read_csv(OUT_PATH, nrows=200000)
 print("Sample rows:", len(sample))
 print("Sample matches:", sample["match_id"].nunique())

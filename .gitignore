@@ -1,0 +1,12 @@
+# --- Data (keep big files out of GitHub) ---
+data/raw/
+data/processed/
+
+# --- macOS ---
+.DS_Store
+
+# --- Python / Jupyter / VS Code ---
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.vscode/
