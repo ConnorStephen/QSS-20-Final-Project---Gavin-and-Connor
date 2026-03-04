@@ -1,19 +1,14 @@
 import pandas as pd
 import numpy as np
 
-# --------------------
-# Inputs / Outputs
-# --------------------
-INPUT_PATH = "data/processed/points_all_parsed.csv"   # big file (ignored by git)
-OUTPUT_PATH = "outputs/player_surface_year.csv"       # small file (commit-able)
+
+INPUT_PATH = "data/processed/points_all_parsed.csv"   
+OUTPUT_PATH = "outputs/player_surface_year.csv"       
 
 # Process in chunks so it doesn't blow RAM
-CHUNKSIZE = 400000  # adjust up/down depending on speed/RAM
+CHUNKSIZE = 400000  
 
-
-# --------------------
-# Helpers
-# --------------------
+# helpers
 def safe_div(numer, denom):
     if denom == 0 or pd.isna(denom):
         return np.nan
@@ -53,7 +48,7 @@ def summarize_group(g):
     """
     n = len(g)
 
-    # Serve direction distribution (ignore NaN)
+    # Serve direction distribution 
     serve_dir_valid = g["serve_dir"].dropna()
     n_dir = len(serve_dir_valid)
 
@@ -134,9 +129,7 @@ def reaggregate(df):
     return out
 
 
-# --------------------
-# Chunked aggregation
-# --------------------
+# chunked aggregation
 server_aggs = []
 returner_aggs = []
 
@@ -151,12 +144,10 @@ reader = pd.read_csv(INPUT_PATH, usecols=usecols, chunksize=CHUNKSIZE)
 for i, chunk in enumerate(reader, start=1):
     print("Chunk", i, "rows:", len(chunk))
 
-    # Coerce types (important because CSV)
     chunk["Svr"] = pd.to_numeric(chunk["Svr"], errors="coerce")
     chunk["Year"] = pd.to_numeric(chunk["Year"], errors="coerce")
     chunk["serve_dir"] = pd.to_numeric(chunk["serve_dir"], errors="coerce")
 
-    # Convert booleans safely (CSV often loads as True/False strings)
     chunk["is_sv"] = chunk["is_sv"].astype(str).str.lower().isin(["true", "1"])
     chunk["is_ace"] = chunk["is_ace"].astype(str).str.lower().isin(["true", "1"])
     chunk["is_unreturned"] = chunk["is_unreturned"].astype(str).str.lower().isin(["true", "1"])
@@ -164,7 +155,6 @@ for i, chunk in enumerate(reader, start=1):
 
     chunk["rally_shots"] = pd.to_numeric(chunk["rally_shots"], errors="coerce")
 
-    # Drop rows missing key grouping vars
     chunk = chunk.dropna(subset=["Svr", "Year", "Surface", "Player 1", "Player 2"])
 
     # Build server-side rows for Player 1 and Player 2
@@ -196,17 +186,14 @@ for i, chunk in enumerate(reader, start=1):
     returner_chunk_agg["role"] = "returner"
     returner_aggs.append(returner_chunk_agg)
 
-# Combine chunk-level aggregates
 server_all = pd.concat(server_aggs, ignore_index=True)
 returner_all = pd.concat(returner_aggs, ignore_index=True)
 
-# Re-aggregate to final groups
 server_final = reaggregate(server_all)
 returner_final = reaggregate(returner_all)
 
 final = pd.concat([server_final, returner_final], ignore_index=True)
 
-# Save
 final.to_csv(OUTPUT_PATH, index=False)
 print("Wrote:", OUTPUT_PATH)
 print("Rows:", len(final))
