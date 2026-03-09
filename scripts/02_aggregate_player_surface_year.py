@@ -16,12 +16,7 @@ def safe_div(numer, denom):
 
 
 def add_player_rows(df, player_col, is_server_side):
-    """
-    Convert match-level Player 1 / Player 2 into player-level rows.
-
-    is_server_side=True  -> keep points where this player served (Svr indicates server: 1 or 2)
-    is_server_side=False -> keep points where this player returned
-    """
+    
     out = df.copy()
     out["player"] = out[player_col]
 
@@ -43,9 +38,7 @@ def add_player_rows(df, player_col, is_server_side):
 
 
 def summarize_group(g):
-    """
-    Compute aggregated metrics for a player-year-surface group.
-    """
+    
     n = len(g)
 
     # Serve direction distribution 
@@ -95,12 +88,7 @@ def summarize_group(g):
 
 
 def reaggregate(df):
-    """
-    Re-aggregate chunk-level aggregates into final aggregates.
-    We recompute:
-      - points: sum
-      - rates/avgs: weighted average by points
-    """
+    
     group_cols = ["player", "Year", "Surface", "role"]
 
     rate_cols = [
